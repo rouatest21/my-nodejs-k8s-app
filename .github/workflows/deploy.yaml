@@ -44,13 +44,24 @@ jobs:
       # It must be at the same indentation level as other '- name:' steps.
       - name: Set up Kubeconfig for K3s
         run: |
-          # These lines were also misaligned. They must be indented under 'run: |'
-          mkdir -p ~/.kube
-          # Decode the base64 secret containing your kubeconfig and write it to ~/.kube/config
-          # This secret must contain the content of your /etc/rancher/k3s/k3s.yaml
-          # with 127.0.0.1 REPLACED by your VM Master's IP (e.g., 192.168.1.15)
-          echo "${{ secrets.KUBECONFIG_BASE64_K3S }}" | base64 -d > ~/.kube/config
-          chmod 600 ~/.kube/config # Set correct permissions
+          # Écriture du secret dans un fichier temporaire pour inspection
+          echo "${{ secrets.KUBECONFIG_BASE64_K3S }}" > /tmp/kubeconfig_b64.txt
+
+          echo "--- Début du débogage Kubeconfig ---"
+          echo "Contenu brut du secret (avec caractères non imprimables):"
+          cat -v /tmp/kubeconfig_b64.txt
+          echo "Longueur du secret:"
+          wc -c /tmp/kubeconfig_b64.txt
+          echo "--- Tentative de décodage ---"
+
+          # Tente de décoder le secret du fichier temporaire
+          base64 -d /tmp/kubeconfig_b64.txt > ~/.kube/config
+
+          echo "--- Fin du débogage Kubeconfig ---"
+
+          mkdir -p ~/.kube # Assurez-vous que le répertoire existe au cas où
+          # chmod 600 ~/.kube/config # Permet de régler les permissions une fois le fichier créé
+          chmod 600 ~/.kube/config # Déplacez cette ligne ici pour s'assurer que le fichier existe avant le chmod
 
       - name: Deploy MongoDB to K3s
         run: |
@@ -65,3 +76,4 @@ jobs:
           kubectl apply -f k8s/app-service.yaml
           # Wait for the application deployment to be ready
           kubectl rollout status deployment/nodejs-app-deployment --timeout=5m
+
