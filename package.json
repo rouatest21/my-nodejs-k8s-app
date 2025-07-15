@@ -1,0 +1,13 @@
+{
+  "name": "ma-node-app",
+  "version": "1.0.0",
+  "description": "Application Node.js simple pour Kubernetes",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^8.0.0"
+  }
+}

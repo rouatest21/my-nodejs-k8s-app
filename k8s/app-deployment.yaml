@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-app-deployment
+  labels:
+    app: nodejs-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nodejs-app
+  template:
+    metadata:
+      labels:
+        app: nodejs-app
+    spec:
+      containers:
+      - name: nodejs-app-container
+        # Remplacez <VOTRE_ORG_GITHUB>/<VOTRE_REPO_GITHUB> par le chemin de votre image sur GitHub Container Registry.
+        # Par exemple: ghcr.io/votre_utilisateur_github/mon-projet-k8s
+        image: ghcr.io/<VOTRE_ORG_GITHUB>/<VOTRE_REPO_GITHUB>:latest 
+        ports:
+        - containerPort: 3000
+        env:
+        - name: MONGODB_URI
+          value: "mongodb://mongodb:27017/ma_base_de_donnees"
